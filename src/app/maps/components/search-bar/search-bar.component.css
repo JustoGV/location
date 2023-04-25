@@ -1,0 +1,11 @@
+.search-conteiner{
+    position: fixed;
+    width: 270px;
+    top: 20px;
+    left: 20px;
+    background-color: white;
+    padding: 5px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
