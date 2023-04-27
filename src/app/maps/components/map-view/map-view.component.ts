@@ -13,7 +13,7 @@ import { Map, Marker, Popup } from 'mapbox-gl';
 })
 export class MapViewComponent implements AfterViewInit {
   @ViewChild('mapDiv') mapDivElement!: ElementRef
-  // dispositivos = [];
+  dispositivos = [];
   mobileNavigatorObject: any = window.navigator;
   
   constructor(
@@ -22,15 +22,15 @@ export class MapViewComponent implements AfterViewInit {
     ) { }
 
 
-  // buscarDispositivos() {
+  buscarDispositivos() {
     
-  //   this.mobileNavigatorObject.bluetooth.requestDevice({ filters: [{ services: ['battery_service'] }] })
-  //     .then(device => {
-  //       console.log(device,'device');
-  //       this.dispositivos.push(device);
-  //     })
-  //     .catch(error => console.log(error));
-  // }
+    this.mobileNavigatorObject.bluetooth.requestDevice({ filters: [{ services: ['battery_service'] }] })
+      .then(device => {
+        console.log(device,'device');
+        this.dispositivos.push(device);
+      })
+      .catch(error => console.log(error));
+  }
   ngAfterViewInit(): void {
 
     if (!this.placesService.userLocation) throw new Error('No hay userLocation')
