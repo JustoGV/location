@@ -13,24 +13,55 @@ import { Map, Marker, Popup } from 'mapbox-gl';
 })
 export class MapViewComponent implements AfterViewInit {
   @ViewChild('mapDiv') mapDivElement!: ElementRef
-  dispositivos = [];
+  // dispositivos = [];
+  device: any;
+  location: string;
   mobileNavigatorObject: any = window.navigator;
-  
+
   constructor(
     private placesService: PlacesServicesService,
     private mapService: MapService
-    ) { }
+  ) { }
 
 
-  buscarDispositivos() {
-    
-    this.mobileNavigatorObject.bluetooth.requestDevice({ filters: [{ services: ['battery_service'] }] })
-      .then(device => {
-        console.log(device,'device');
-        this.dispositivos.push(device);
-      })
-      .catch(error => console.log(error));
+  //OBTENER LA UBI DEL BLE
+
+
+  async connectToDevice() {
+    try {
+      // Busca el dispositivo BLE
+      this.device = await this.mobileNavigatorObject.bluetooth.requestDevice({
+        filters: [{ services: ['battery_service'] }]
+      });
+
+      // Conecta al dispositivo BLE
+      await this.device.gatt.connect();
+
+      // Obtiene la característica de ubicación del dispositivo
+      const service = await this.device.gatt.getPrimaryService('location_service');
+      const characteristic = await service.getCharacteristic('location_characteristic');
+
+      // Lee el valor de la característica
+      const value = await characteristic.readValue();
+      this.location = value.getUint8(0);
+
+      // Desconecta del dispositivo BLE
+      await this.device.gatt.disconnect();
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+
+  // buscarDispositivos() {
+
+  //   this.mobileNavigatorObject.bluetooth.requestDevice({ filters: [{ services: ['battery_service'] }] })
+  //     .then(device => {
+  //       console.log(device,'device');
+  //       this.dispositivos.push(device);
+  //     })
+  //     .catch(error => console.log(error));
+  // }
   ngAfterViewInit(): void {
 
     if (!this.placesService.userLocation) throw new Error('No hay userLocation')
@@ -43,7 +74,7 @@ export class MapViewComponent implements AfterViewInit {
     });
     // if (mobileNavigatorObject && mobileNavigatorObject.bluetooth) {
     //   // Here write your logic of mobileNavigatorObject.bluetooth.requestDevice();
-      
+
     //   // mobileNavigatorObject.bluetooth.requestDevice({ filters: [{ services: ['battery_service'] }] })
     //   //   .then((device:any) => {
     //   //     // Conectar al dispositivo BLE y obtener las coordenadas

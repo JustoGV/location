@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { Feature, PlacesResponse } from '../interfaces/places';
 import { PlacesApiClient } from '../api';
 import { MapService } from './map.service';
+declare var cordova:any
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +12,12 @@ export class PlacesServicesService {
   public userLocation?: [number, number]
   public isLoading:boolean=false
   public places: Feature[]=[]
+  public beaconInfo:any={}
   
   get isUserLocationReady(): boolean {
     return !!this.userLocation
   }
+  
 
   constructor(
     private placesapi:PlacesApiClient,
@@ -27,11 +30,12 @@ export class PlacesServicesService {
 
     return new Promise((resolve, reject) => {
 
-      navigator.geolocation.getCurrentPosition(
+      navigator.geolocation.watchPosition(
         ({ coords }) => {
           // console.log(coords,'coords')
           this.userLocation = [coords.latitude, coords.longitude]
           this.userLocation.reverse()
+          // console.log(this.userLocation)
           resolve(this.userLocation)
         },
         (err) => {
@@ -74,4 +78,33 @@ export class PlacesServicesService {
   deltePlaces(){
     this.places=[]
   }
+
+  // getBeacon(){
+  //    // Define el UUID del Beacon a detectar
+  //    const beaconUuid = '1234';
+
+  //    // Escanea para detectar el Beacon
+  //    cordova.plugins.BluetoothLE.scan([], 10, (device) => {
+  //      if (device.name === beaconUuid) {
+  //        // Almacena la información del Beacon detectado
+  //        this.beaconInfo = device;
+ 
+  //        // Calcula la distancia y la dirección del Beacon en relación con el dispositivo móvil
+  //        let distance = Math.pow(10, ((-69 - (device.rssi)) / (10 * 2)));
+  //        let direction = (device.rssi > -75) ? 'Norte' : 'Oeste';
+ 
+  //        // Muestra la información del Beacon en la consola
+  //        console.log(`Beacon detectado: ${device.id}, distancia: ${distance} metros, dirección: ${direction}`);
+ 
+  //        // Detiene el escaneo una vez que se detecta el Beacon
+  //        cordova.plugins.BluetoothLE.stopScan(() => {
+  //          console.log('Escaneo detenido');
+  //        }, (error) => {
+  //          console.log(`Error al detener el escaneo: ${error}`);
+  //        });
+  //      }
+  //    }, (error) => {
+  //      console.log(`Error al escanear BLE: ${error}`);
+  //    });
+  // }
 }
